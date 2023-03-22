@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-    module for command line interface for AirBnB clone
+    module for command line interface for HealthLink clone
 '''
 import cmd
 import sys
@@ -15,7 +15,7 @@ from models.review import Review
 from models import storage
 
 
-class HBNBCommand(cmd.Cmd):
+class HLINKCommand(cmd.Cmd):
     '''contain the command handlers'''
     classes = {
                 'BaseModel': BaseModel,
@@ -27,15 +27,13 @@ class HBNBCommand(cmd.Cmd):
                 'Review': Review
                 }
     commands = ['all', 'count', 'destroy', 'show', 'update']
-    prompt = '(hbnb) '
-    intro = 'Welcome to my AirBnB command interface, type help to get started'
-
+    prompt = '(hlink) '
+    intro = 'Welcome to my HealthLink command interface, type help'
 
     def parser(self, line):
         '''parses the functions'''
         my_list = list(filter(None, re.split(r'[\"\(\), .]+', line)))
         return my_list
-
 
     def validate(self, line, n):
         '''validates input'''
@@ -53,10 +51,8 @@ class HBNBCommand(cmd.Cmd):
             return storage.all().get(key, '** no instance found **')
         return ('valid')
 
-
     def do_create(self, line):
         '''creates new object'''
-
         lines = line.split(' ')
         if len(lines) > 1:
             if lines[0] in self.classes:
@@ -66,8 +62,8 @@ class HBNBCommand(cmd.Cmd):
                     val = eval(key_val[1])
                     if type(val) == str:
                         val = key_val[1].strip('"')
-                        val = val.rehospital('"', r'\"')
-                        val = val.rehospital(' ', '_')
+                        val = val.replace('"', r'\"')
+                        val = val.replace(' ', '_')
                     my_dict[key_val[0]] = val
                 ob = eval(lines[0])(**my_dict)
                 storage.new(ob)
@@ -86,12 +82,9 @@ class HBNBCommand(cmd.Cmd):
             storage.save()
             print(ob.id)
 
-
-
     def help_create(self):
         print('creates a new object')
-        print('Usage: (HBNB) show <class>')
-
+        print('Usage: (hlink) create <class>')
 
     def do_show(self, line):
         '''prints string representation of an instance'''
@@ -99,8 +92,6 @@ class HBNBCommand(cmd.Cmd):
         obj = self.validate(args, 2)
         if obj is not None:
             print(obj)
-
-
 
     def do_all(self, line):
         '''Prints all string representation of all instances'''
@@ -110,17 +101,13 @@ class HBNBCommand(cmd.Cmd):
             my_list = [str(ob) for ob in storage.all(args[0]).values()]
             print(my_list)
 
-
     def help_all(self):
         print('Prints all string representation of all instances')
-        print('Usage: (HBNB) all <class>')
-
-
+        print('Usage: (hlink) all <class>')
 
     def help_show(self):
         print('prints string representation of an instance')
-        print('Usage: (HBNB) show <class> <id>')
-
+        print('Usage: (hlink) show <class> <id>')
 
     def do_update(self, line):
         '''Updates an instance'''
@@ -137,7 +124,6 @@ class HBNBCommand(cmd.Cmd):
         if args[2] not in exempt:
             setattr(obj, args[2], value)
 
-
     def do_destroy(self, line):
         '''Deletes an instance'''
         args = self.parser(line)
@@ -147,18 +133,15 @@ class HBNBCommand(cmd.Cmd):
         key = '{}.{}'. format(args[0], args[1])
         del storage.all()[key]
 
-
     def help_destroy(self):
         print('Deletes an instance')
         print('Usage: destroy <class name> <id>')
-
 
     def help_update(self):
         print('Updates an instance')
         s = 'Usage: update <class name> <id> '
         t = '<attribute name> "<attribute value>"'
         print('{}{}'. format(s, t))
-
 
     def execute(self, args):
         '''executes commands for default handler'''
@@ -175,10 +158,12 @@ class HBNBCommand(cmd.Cmd):
             return None
         if args[1] == 'all':
             print(args[1])
-            l = [str(o) for k, o in storage.all().items() if k.find(args[0]) != -1]
-            return (l)
+            m_list = [str(o) for k, o in storage.all().items()
+                      if k.find(args[0]) != -1]
+            return (m_list)
         if args[1] == 'count':
-            l = [o for k, o in storage.all().items() if k.find(args[0]) != -1]
+            m_list = [o for k, o in storage.all().items()
+                      if k.find(args[0]) != -1]
             return len(l)
         if args[1] == 'show':
             if len(args) != 3:
@@ -209,9 +194,10 @@ class HBNBCommand(cmd.Cmd):
                 return None
             return (o,)
 
-
     def default(self, line):
-        '''method to handle unrecognized command prefix'''
+        '''
+        method to handle unrecognized command prefix
+        '''
         args = self.parser(line)
         string = line.strip(')')
         x = string.find('{')
@@ -245,52 +231,50 @@ class HBNBCommand(cmd.Cmd):
         print('***** more advanced usage *****')
         print()
         print('* To show all objects of a class *')
-        print('Usage: (HBNB) <class name>.all()')
+        print('Usage: (hlink) <class name>.all()')
         print()
         print('* To count all objects of a class *')
-        print('Usage: (HBNB) <class name>.count()')
+        print('Usage: (hlink) <class name>.count()')
         print()
         print('* To show a particular object of a class *')
-        print('Usage: (HBNB) <class name>.show(<id>)')
+        print('Usage: (hlink) <class name>.show(<id>)')
         print()
         print('      * To destroy an object *')
-        print('Usage: (HBNB) <class name>.destroy(<id>')
+        print('Usage: (hlink) <class name>.destroy(<id>')
         print()
         print('   * To update an object * ')
         s = '<attribute name>, <attribute value>)'
-        print('Usage: (HBNB) <class name>.update(<id>, {}'. format(s))
+        print('Usage: (hlink) <class name>.update(<id>, {}'. format(s))
         print()
         print('         * To update an object with dictionary *')
         j = '(<id>, <dictionary representation>)'
-        print('Usage: (HBNB) <class name>.update{}'. format(j))
-
-
+        print('Usage: (hlink) <class name>.update{}'. format(j))
 
     def help_EOF(self):
         '''exits the program'''
         print('exits the program')
-
 
     def do_EOF(self, line):
         '''exits the program'''
         print('Bye')
         exit()
 
-
     def do_quit(self, line):
         '''exits from the interface'''
         print('Bye')
         exit()
 
-
     def help_quit(self):
         '''exits from the interface'''
         print('exits the program')
 
-
     def emptyline(self):
+        '''
+        Called when an empty line is entered in the console
+        This function does nothing and simply returns.
+        '''
         pass
 
 
 if __name__ == '__main__':
-    HBNBCommand().cmdloop()
+    hlinkCommand().cmdloop()

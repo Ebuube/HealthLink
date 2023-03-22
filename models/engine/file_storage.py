@@ -19,7 +19,7 @@ class FileStorage():
         '''returns all stored objects'''
         if cls:
             o_d = self.__objects.items()
-            return {k: o for k, o in o_d if cls.__name__ in k}
+            return {k: o for k, o in o_d if eval(cls).__name__ in k}
         return self.__objects
 
     def new(self, obj):
@@ -57,7 +57,7 @@ class FileStorage():
 
     def get(self, cls, id):
         '''retrieve one object'''
-        key = '{}.{}'. format(cls.__name__, id)
+        key = '{}.{}'. format(eval(cls).__name__, id)
         return self.all().get(key)
 
     def count(self, cls=None):
