@@ -1,0 +1,3 @@
+# THIS FILE SPECIFIES THE FILE PATTERRNS TO IGNORE FOR TRACKING AND COMMITING
+
+*.swp	# Used by vi/vim to store recovery versions of a file
