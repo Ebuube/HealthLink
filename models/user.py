@@ -15,8 +15,6 @@ class User(BaseModel, Base):
         password = Column(String(128), nullable=False)
         first_name = Column(String(128))
         last_name = Column(String(128))
-        hospitals = relationship('Hospital', backref='user',
-                              cascade='all, delete-orphan')
         reviews = relationship('Review', backref='user',
                                cascade='all, delete-orphan')
 
