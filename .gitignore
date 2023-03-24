@@ -3,3 +3,4 @@
 *.swp	# Used by vi/vim to store recovery versions of a file
 __pycache__	# Removing cached data that can be easily regenerated
 *.pem   # file extension for files containing openssl generated privatekeys
+*.json  # files used to store json serielized python objects
