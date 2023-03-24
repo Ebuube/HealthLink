@@ -2,8 +2,6 @@
 '''module contains my app'''
 from flask import Flask, Blueprint, jsonify, make_response
 from flask_cors import CORS
-
-app = Flask(__name__)
 from os import getenv
 import models
 from api.v1.views import app_views
@@ -14,6 +12,9 @@ from api.v1.views import User_view
 from api.v1.views import Hospital_view
 from api.v1.views import Review_view
 from api.v1.views import Hospital_Service_view
+
+app = Flask(__name__)
+
 app.register_blueprint(app_views, url_prefix='/api/v1')
 app.register_blueprint(State_view, url_prefix='/api/v1')
 app.register_blueprint(City_view, url_prefix='/api/v1')
@@ -28,6 +29,7 @@ cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 @app.teardown_appcontext
 def teardown(exception):
     models.storage.close()
+
 
 @app.errorhandler(404)
 def not_found(error):

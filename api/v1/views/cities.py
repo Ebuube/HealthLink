@@ -1,5 +1,6 @@
 #!/usr/bin/python3
-from flask import Blueprint, jsonify, make_response, request
+'''module for the city routes'''
+from flask import Blueprint, jsonify, request
 from api.v1.views import City_view
 import models
 from models.state import State
@@ -7,58 +8,67 @@ from models.city import City
 
 
 @City_view.route('/states/<state_id>/cities')
-def cities(state_id):
-    ob = models.storage.get(State, state_id)
-    if (ob):
-        o_l = ob.cities
-        return jsonify([o.to_dict() for o in o_l])
-    return make_response(jsonify({"Error": "State not found"}), 404)
+def GET_cities(state_id):
+    state = models.storage.get(State, state_id)
+    if (state):
+        cities = state.cities
+        return jsonify([city.to_dict() for city in cities])
+    return jsonify({"Error": "State not found"}), 404
+
 
 @City_view.route('/cities/<city_id>')
-def city_id(city_id):
+def GET_city(city_id):
     key = 'City.{}'. format(city_id)
     if (models.storage.all(City).get(key)):
         return jsonify(models.storage.all(City).get(key).to_dict())
     else:
-        return make_response(jsonify({"Error": "not found"}), 404)
+        return jsonify({"Error": "not found"}), 404
+
 
 @City_view.route('/cities/<city_id>', methods=['DELETE'])
-def delete_city(city_id):
+def DELETE_city(city_id):
     key = 'City.{}'. format(city_id)
-    ob = models.storage.all(City)[key]
-    models.storage.delete(ob)
-    models.storage.save()
-    models.storage.reload()
-    return jsonify({}), 200
+    city_o = models.storage.all(City)[key]
+
+    if (city_o):
+        models.storage.delete(city_o)
+        models.storage.save()
+        return jsonify({}), 200
+
+    return jsonify({"Error": "not found"}), 404
+
 
 @City_view.route('/states/<state_id>/cities', methods=['POST'])
-def make_city(state_id):
-    ob = models.storage.get(State, state_id)
+def POST_city(state_id):
+    state = models.storage.get(State, state_id)
 
-    if (ob):
+    if (state):
         my_dict = request.get_json()
         if not my_dict:
             return jsonify({'message': 'Not a JSON'}), 400
         if 'name' not in my_dict:
             return jsonify({'message': 'Missing name'}), 400
-        ob = City(**my_dict)
-        ob.state_id = state_id
-        ob.save()
-        models.storage.reload()
-        return jsonify(ob.to_dict()), 201
-    return make_response(jsonify({"Error": "State not found"}), 404)
+        city_o = City(**my_dict)
+        city_o.state_id = state_id
+        city_o.save()
+        return jsonify(city_o.to_dict()), 201
+
+    return jsonify({"Error": "State not found"}), 404
+
 
 @City_view.route('/cities/<city_id>', methods=['PUT'])
-def update_city(city_id):
+def UPDATE_city(city_id):
     key = 'City.{}'. format(city_id)
-    ob = models.storage.all(City).get(key)
-    if (ob):
-        my_dict = request.get_json()
-        if not my_dict:
+    city_o = models.storage.all(City).get(key)
+
+    if (city_o):
+        req = request.get_json()
+        if not req:
             return jsonify({'message': 'Not a JSON'}), 400
-        for k, v in my_dict.items():
+        for k, v in req.items():
             if k not in ['id', 'created_at', 'updated_at']:
-                setattr(ob, k, v)
-        ob.save()
-        return jsonify(ob.to_dict()), 200
-    return make_response(jsonify({"Error": "not found"}), 404)
+                setattr(city_o, k, v)
+        city_o.save()
+        return jsonify(city_o.to_dict()), 200
+
+    return jsonify({"Error": "not found"}), 404
